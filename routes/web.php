@@ -5,6 +5,7 @@ use App\Http\Controllers\ClientAppointmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestBookingController;
 use App\Http\Controllers\InfoPageController;
+use App\Http\Controllers\ReviewsController;
 use App\Http\Controllers\SpecialistController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,8 @@ Route::get('/', function () {
 
 Route::get('/specialists', [SpecialistController::class, 'index'])->name('specialists.index');
 Route::get('/info/{slug}', [InfoPageController::class, 'show'])->name('info.show');
+Route::get('/reviews', [ReviewsController::class, 'index'])->name('reviews.index');
+Route::post('/reviews', [ReviewsController::class, 'store'])->name('reviews.store');
 
 Route::get('/login', [AuthWebController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthWebController::class, 'login']);

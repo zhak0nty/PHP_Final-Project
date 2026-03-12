@@ -1,0 +1,116 @@
+@extends('layouts.app')
+
+@section('title', 'Отзывы — MedBooking')
+
+@section('content')
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
+        <div class="mb-8">
+            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Отзывы</h1>
+            <p class="mt-2 text-gray-600 max-w-2xl">
+                Поделитесь опытом посещения или расскажите, что можно сделать лучше. Это анонимно — указывайте только то, что считаете нужным.
+            </p>
+        </div>
+
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr),minmax(0,1.5fr)] items-start">
+            <div class="space-y-6">
+                {{-- Форма отзыва --}}
+                <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Оставить отзыв</h2>
+                    <form method="POST" action="{{ route('reviews.store') }}" class="space-y-4">
+                        @csrf
+                        <input type="hidden" name="kind" value="review">
+                        <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-700 mb-1.5">Ваше имя (необязательно)</label>
+                                <input id="name" name="name" type="text"
+                                       class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors"
+                                       placeholder="Можно оставить пустым">
+                            </div>
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1.5">Телефон (необязательно)</label>
+                                <input id="phone" name="phone" type="text"
+                                       class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors"
+                                       placeholder="+7 (___) ___-__-__">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="text" class="block text-sm font-medium text-gray-700 mb-1.5">Напишите отзыв</label>
+                            <textarea id="text" name="text" rows="4"
+                                      class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors resize-none"
+                                      placeholder="Например: что понравилось, что можно улучшить"></textarea>
+                        </div>
+                        <button type="submit"
+                                class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#6B21A8] px-4 py-3 text-sm font-medium text-white shadow-sm hover:bg-[#5B1B8A] transition-colors">
+                            Отправить отзыв
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </button>
+                    </form>
+                </div>
+
+                {{-- Список отзывов --}}
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Последние отзывы</h2>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        @forelse ($reviews as $review)
+                            <article class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                                <div class="flex items-center justify-between gap-3 mb-2">
+                                    <div class="font-semibold text-gray-900">{{ $review->name ?: 'Аноним' }}</div>
+                                    <div class="text-xs text-gray-400">{{ $review->created_at->format('d.m.Y H:i') }}</div>
+                                </div>
+                                <p class="text-sm text-gray-700 leading-relaxed">
+                                    {{ $review->text }}
+                                </p>
+                            </article>
+                        @empty
+                            <p class="text-sm text-gray-500 col-span-2">Пока нет отзывов. Будьте первым, кто поделится опытом.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            {{-- Блок жалоб/предложений --}}
+                <div class="space-y-6">
+                <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                    <div class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                        Нам важно ваше мнение
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-gray-900">У вас есть жалоба или идея?</h2>
+                    <p class="mt-2 text-sm text-gray-600">
+                        Напишите, что можно улучшить: удобство записи, работу врача или интерфейс. Это поможет сделать сервис лучше.
+                    </p>
+                    <form method="POST" action="{{ route('reviews.store') }}" class="mt-4 space-y-3">
+                        @csrf
+                        <input type="hidden" name="kind" value="complaint">
+                        <div>
+                            <label for="complaint_name" class="block text-sm font-medium text-gray-700 mb-1.5">Имя <span class="text-red-500">*</span></label>
+                            <input id="complaint_name" name="complaint_name" type="text"
+                                   class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors"
+                                   placeholder="Ваше имя">
+                        </div>
+                        <div>
+                            <label for="complaint_phone" class="sr-only">Телефон</label>
+                            <input id="complaint_phone" name="complaint_phone" type="text"
+                                   class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors"
+                                   placeholder="Ваш телефон (необязательно)">
+                        </div>
+                        <div>
+                            <label for="complaint_text" class="sr-only">Комментарий</label>
+                            <textarea id="complaint_text" name="complaint_text" rows="3"
+                                      class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors resize-none"
+                                      placeholder="Опишите проблему или предложение"></textarea>
+                        </div>
+                        <button type="submit"
+                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-50 transition-colors">
+                            Отправить предложение
+                        </button>
+                        <p class="text-[11px] text-gray-400">
+                            Все сообщения попадают в систему MedBooking. Их видит только администратор/руководитель клиники — мы не передаём их третьим лицам.
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+

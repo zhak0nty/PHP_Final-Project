@@ -30,6 +30,7 @@
                             <a href="{{ route('home') }}" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8] transition-colors">Главная</a>
                             <a href="{{ route('home') }}#services" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8] transition-colors">Услуги</a>
                             <a href="{{ route('home') }}#doctors" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8] transition-colors">Врачи</a>
+                            <a href="{{ route('reviews.index') }}" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8] transition-colors">Отзывы</a>
                             <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8] transition-colors">Запись</a>
                         </nav>
 
