@@ -9,12 +9,21 @@
                 <h1 class="text-2xl font-bold text-gray-900">Вход</h1>
                 <p class="mt-2 text-gray-500 text-sm">Demo: client@example.com, admin@example.com, doctor1@example.com · пароль <code class="bg-gray-100 px-1.5 py-0.5 rounded text-gray-700">password</code></p>
             </div>
+            @if(auth()->check() && ! auth()->user()->isClient())
+                <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-left text-sm text-amber-950">
+                    Вы вошли как <strong>{{ auth()->user()->role }}</strong>. Введите данные <strong>клиента</strong>, чтобы переключиться на этот аккаунт, или сначала
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="font-medium text-[#6B21A8] underline bg-transparent border-0 p-0 cursor-pointer hover:text-[#5B1B8A]">выйдите</button>
+                    </form>.
+                </div>
+            @endif
             <div class="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm">
                 <form method="POST" action="{{ url('/login') }}" class="space-y-5">
                     @csrf
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
+                        <input id="email" name="email" type="email" value="{{ old('email', request('email')) }}" required autofocus
                             class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors"
                             placeholder="example@mail.ru">
                     </div>

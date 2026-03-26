@@ -34,7 +34,7 @@
                             </span>
                             <div>
                                 <div class="font-semibold text-gray-900">Удобное расписание</div>
-                                <p class="text-sm text-gray-600 mt-0.5">Слоты на несколько дней вперёд</p>
+                                <p class="text-sm text-gray-600 mt-0.5">Запись на несколько дней вперёд</p>
                             </div>
                         </div>
                         <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 flex items-start gap-3">
@@ -63,10 +63,9 @@
                                 <div class="rounded-xl bg-white/95 backdrop-blur-sm px-3 py-2.5 text-gray-800 shadow-lg border border-gray-200/80">
                                     <div class="flex items-center gap-1.5 text-xs font-medium text-[#6B21A8]">
                                         <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                                        Демо-аккаунты
+                                        Онлайн-запись
                                     </div>
-                                    <p class="text-[11px] text-gray-600 mt-0.5">admin · doctor1 · client@example.com</p>
-                                    <p class="text-[11px] text-gray-500">пароль: password</p>
+                                    <p class="text-[11px] text-gray-600 mt-0.5 leading-snug">Выберите специалиста и удобное время. Можно записаться без регистрации — данные защищены.</p>
                                 </div>
                             </div>
                         </div>
@@ -177,7 +176,7 @@
                     <p class="text-sm font-medium text-[#6B21A8]">О нас</p>
                     <h2 class="mt-1 text-2xl lg:text-3xl font-bold text-gray-900">Забота. Экспертиза. Качество.</h2>
                     <p class="mt-4 text-gray-600 leading-relaxed">
-                        MedBooking — это простая система записи к врачу или мастеру: администратор настраивает врачей и расписание, клиенты выбирают слот и записываются в пару кликов. Врач видит свои приёмы, клиент — свои записи. Всё в одном месте.
+                        MedBooking — это простая система записи к врачу или мастеру: администратор настраивает врачей и расписание, клиенты выбирают время и записываются в пару кликов. Врач видит свои приёмы, клиент — свои записи. Всё в одном месте.
                     </p>
                     <a href="{{ route('register') }}" class="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#6B21A8] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#5B1B8A]">
                         Записаться на приём

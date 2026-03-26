@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\Service;
 use App\Models\TimeSlot;
+use App\Services\TimeSlotGenerator;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -42,7 +43,9 @@ class DashboardController extends Controller
         }
 
         // Client dashboard
-        $doctors = Doctor::with('user', 'services', 'timeSlots')->get();
+        TimeSlotGenerator::ensureUpcomingSlotsExist();
+
+        $doctors = Doctor::with('user', 'services', 'futureTimeSlots')->get();
         $appointments = $user->clientAppointments()
             ->with('doctor.user', 'service', 'timeSlot')
             ->orderBy('created_at', 'desc')
@@ -51,4 +54,3 @@ class DashboardController extends Controller
         return view('dashboard.client', compact('user', 'doctors', 'appointments'));
     }
 }
-

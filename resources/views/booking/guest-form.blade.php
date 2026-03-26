@@ -65,7 +65,7 @@
                                 class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors bg-white">
                                 <option value="">Сначала выберите врача</option>
                                 @foreach ($doctors as $doctor)
-                                    @foreach ($doctor->timeSlots as $slot)
+                                    @foreach ($doctor->futureTimeSlots as $slot)
                                         <option value="{{ $slot->id }}" data-doctor-id="{{ $doctor->id }}" @selected(old('time_slot_id') == $slot->id)>
                                             {{ $slot->starts_at->format('d.m.Y H:i') }}–{{ $slot->ends_at->format('H:i') }}
                                         </option>
@@ -107,7 +107,7 @@
                     </li>
                     <li class="flex gap-3">
                         <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#6B21A8]/10 text-[#6B21A8] font-medium">2</span>
-                        Запись сохраняется на <strong>5 минут</strong>. За это время слот зарезервирован.
+                        Запись сохраняется на <strong>5 минут</strong>. За это время выбранное время приёма удерживается за вами.
                     </li>
                     <li class="flex gap-3">
                         <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#6B21A8]/10 text-[#6B21A8] font-medium">3</span>
@@ -133,7 +133,7 @@
                 var timePlaceholder = timeSelect.querySelector('option[value=""]');
 
                 servicePlaceholder.textContent = doctorId ? 'Выберите услугу…' : 'Сначала выберите врача';
-                timePlaceholder.textContent = doctorId ? 'Выберите слот…' : 'Сначала выберите врача';
+                timePlaceholder.textContent = doctorId ? 'Выберите время…' : 'Сначала выберите врача';
 
                 [].forEach.call(serviceSelect.options, function (opt) {
                     if (opt.value === '') return;

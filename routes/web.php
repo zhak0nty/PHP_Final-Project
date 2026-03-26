@@ -33,6 +33,7 @@ Route::get('/booking/success', function () {
     if (! session()->has('appointment_created')) {
         return redirect()->route('home');
     }
+
     return view('booking.success', [
         'appointment' => session('appointment_created'),
         'guest' => true,
@@ -49,6 +50,7 @@ Route::middleware('auth')->group(function () {
             if (! session()->has('appointment_created')) {
                 return redirect()->route('dashboard');
             }
+
             return view('booking.success', [
                 'appointment' => session('appointment_created'),
                 'guest' => false,

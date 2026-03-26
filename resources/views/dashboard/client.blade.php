@@ -6,7 +6,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
         <div class="mb-8">
             <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Запись к врачу</h1>
-            <p class="mt-2 text-gray-600">Выберите врача, услугу и свободный слот. Система проверит корректность.</p>
+            <p class="mt-2 text-gray-600">Выберите врача, услугу и удобное время приёма. Система проверит корректность.</p>
         </div>
 
         <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr),minmax(0,3fr)] items-start">
@@ -47,7 +47,7 @@
                                 class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors bg-white">
                                 <option value="">Сначала выберите врача</option>
                                 @foreach ($doctors as $doctor)
-                                    @foreach ($doctor->timeSlots as $slot)
+                                    @foreach ($doctor->futureTimeSlots as $slot)
                                         <option value="{{ $slot->id }}" data-doctor-id="{{ $doctor->id }}" @selected(old('time_slot_id') == $slot->id)>
                                             {{ $slot->starts_at->format('d.m.Y H:i') }}–{{ $slot->ends_at->format('H:i') }}
                                         </option>
@@ -134,7 +134,7 @@
                 var timePlaceholder = timeSelect.querySelector('option[value=""]');
 
                 servicePlaceholder.textContent = doctorId ? 'Выберите услугу…' : 'Сначала выберите врача';
-                timePlaceholder.textContent = doctorId ? 'Выберите слот…' : 'Сначала выберите врача';
+                timePlaceholder.textContent = doctorId ? 'Выберите время…' : 'Сначала выберите врача';
 
                 [].forEach.call(serviceSelect.options, function (opt) {
                     if (opt.value === '') return;

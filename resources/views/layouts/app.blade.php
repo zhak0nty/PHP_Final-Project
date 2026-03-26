@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>@yield('title', config('app.name', 'MedBooking'))</title>
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=dm-sans:400,500,600,700" rel="stylesheet" />
@@ -29,7 +30,7 @@
                         <nav class="hidden md:flex items-center justify-center gap-8 flex-1 px-8">
                             <a href="{{ route('home') }}" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8] transition-colors">Главная</a>
                             <a href="{{ route('home') }}#services" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8] transition-colors">Услуги</a>
-                            <a href="{{ route('home') }}#doctors" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8] transition-colors">Врачи</a>
+                            <a href="{{ route('specialists.index') }}" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8] transition-colors">Врачи</a>
                             <a href="{{ route('reviews.index') }}" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8] transition-colors">Отзывы</a>
                             <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8] transition-colors">Запись</a>
                         </nav>

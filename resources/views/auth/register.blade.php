@@ -9,6 +9,17 @@
                 <h1 class="text-2xl font-bold text-gray-900">Регистрация клиента</h1>
                 <p class="mt-2 text-gray-500 text-sm">Роль <span class="text-[#6B21A8] font-medium">client</span>. Админ и врач — через demo-аккаунты.</p>
             </div>
+            @if(auth()->check() && ! auth()->user()->isClient())
+                <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-left text-sm text-amber-950">
+                    Сейчас вы вошли как <strong>{{ auth()->user()->role }}</strong>. Здесь создаётся аккаунт <strong>клиента</strong> для привязки гостевой записи. После отправки формы вы войдёте под новым пользователем.
+                </div>
+            @endif
+            @if($errors->has('email') && old('email'))
+                <div class="mb-4 rounded-xl border border-[#6B21A8]/25 bg-[#6B21A8]/5 px-4 py-3 text-center text-sm text-gray-800">
+                    <a href="{{ route('login', ['email' => old('email')]) }}" class="font-medium text-[#6B21A8] hover:underline">Войти с этим email</a>
+                    — гостевая запись привяжется после входа.
+                </div>
+            @endif
             <div class="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm">
                 <form method="POST" action="{{ url('/register') }}" class="space-y-5">
                     @csrf

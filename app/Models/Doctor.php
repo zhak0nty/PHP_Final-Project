@@ -30,9 +30,16 @@ class Doctor extends Model
         return $this->hasMany(TimeSlot::class);
     }
 
+    /** Слоты, которые ещё не начались (для записи). */
+    public function futureTimeSlots()
+    {
+        return $this->hasMany(TimeSlot::class)
+            ->future()
+            ->orderBy('starts_at');
+    }
+
     public function appointments()
     {
         return $this->hasMany(Appointment::class);
     }
 }
-

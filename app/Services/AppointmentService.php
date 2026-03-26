@@ -22,11 +22,12 @@ class AppointmentService
         /** @var TimeSlot $slot */
         $slot = TimeSlot::whereKey($data['time_slot_id'])
             ->where('doctor_id', $doctor->id)
-            ->firstOrFail();
+            ->future()
+            ->first();
 
-        if ($slot->starts_at->isPast()) {
+        if (! $slot) {
             throw ValidationException::withMessages([
-                'time_slot_id' => ['Selected time slot is in the past.'],
+                'time_slot_id' => ['Выбранное время недоступно или уже прошло.'],
             ]);
         }
 
@@ -67,11 +68,12 @@ class AppointmentService
         /** @var TimeSlot $slot */
         $slot = TimeSlot::whereKey($data['time_slot_id'])
             ->where('doctor_id', $doctor->id)
-            ->firstOrFail();
+            ->future()
+            ->first();
 
-        if ($slot->starts_at->isPast()) {
+        if (! $slot) {
             throw ValidationException::withMessages([
-                'time_slot_id' => ['Selected time slot is in the past.'],
+                'time_slot_id' => ['Выбранное время недоступно или уже прошло.'],
             ]);
         }
 
@@ -122,4 +124,3 @@ class AppointmentService
             ]);
     }
 }
-

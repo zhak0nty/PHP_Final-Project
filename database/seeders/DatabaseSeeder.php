@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Doctor;
 use App\Models\Service;
-use App\Models\TimeSlot;
 use App\Models\User;
+use App\Services\TimeSlotGenerator;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -57,7 +57,7 @@ class DatabaseSeeder extends Seeder
         $doctors = collect($doctorsData)->map(function (array $data, int $i) use ($services) {
             $user = User::factory()->create([
                 'name' => $data['name'],
-                'email' => 'doctor' . ($i + 1) . '@example.com',
+                'email' => 'doctor'.($i + 1).'@example.com',
                 'role' => User::ROLE_DOCTOR,
             ]);
 
@@ -77,22 +77,7 @@ class DatabaseSeeder extends Seeder
             'role' => User::ROLE_CLIENT,
         ]);
 
-        $now = now();
-
-        $doctors->each(function (Doctor $doctor) use ($now) {
-            foreach (range(1, 3) as $dayOffset) {
-                foreach ([9, 10, 11, 14, 15] as $hour) {
-                    $start = $now->copy()->addDays($dayOffset)->setTime($hour, 0);
-                    $end = $start->copy()->addMinutes(30);
-
-                    TimeSlot::create([
-                        'doctor_id' => $doctor->id,
-                        'starts_at' => $start,
-                        'ends_at' => $end,
-                    ]);
-                }
-            }
-        });
+        TimeSlotGenerator::ensureUpcomingSlotsExist();
 
     }
 }

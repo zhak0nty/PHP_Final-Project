@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreGuestAppointmentRequest;
 use App\Models\Doctor;
 use App\Services\AppointmentService;
+use App\Services\TimeSlotGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -12,12 +13,13 @@ class GuestBookingController extends Controller
 {
     public function __construct(
         protected AppointmentService $appointmentService
-    ) {
-    }
+    ) {}
 
     public function showForm(): View
     {
-        $doctors = Doctor::with('user', 'services', 'timeSlots')->get();
+        TimeSlotGenerator::ensureUpcomingSlotsExist();
+
+        $doctors = Doctor::with('user', 'services', 'futureTimeSlots')->get();
 
         return view('booking.guest-form', compact('doctors'));
     }

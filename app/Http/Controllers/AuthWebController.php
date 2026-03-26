@@ -12,11 +12,12 @@ class AuthWebController extends Controller
 {
     public function __construct(
         protected AppointmentService $appointmentService
-    ) {
-    }
+    ) {}
+
     public function showLoginForm()
     {
-        if (Auth::check()) {
+        // Как и регистрация: только клиентов отправляем в кабинет; админ/врач видит форму входа.
+        if (Auth::check() && Auth::user()->isClient()) {
             return redirect()->intended(route('dashboard'));
         }
 
@@ -25,7 +26,9 @@ class AuthWebController extends Controller
 
     public function showRegisterForm()
     {
-        if (Auth::check()) {
+        // Уже клиент — в кабинет. Админ/врач остаётся на форме регистрации клиента
+        // (гостевая запись → «Зарегистрироваться»), иначе редирект вёл в админ-панель.
+        if (Auth::check() && Auth::user()->isClient()) {
             return redirect()->intended(route('dashboard'));
         }
 
@@ -47,6 +50,11 @@ class AuthWebController extends Controller
 
         $request->session()->regenerate();
 
+        $user = Auth::user();
+        if ($user && $user->isClient()) {
+            $this->appointmentService->attachGuestAppointmentsToUser($user);
+        }
+
         return redirect()->intended('/dashboard');
     }
 
@@ -56,6 +64,8 @@ class AuthWebController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'email.unique' => 'Этот email уже зарегистрирован. Войдите под этим адресом — гостевая запись привяжется к аккаунту.',
         ]);
 
         $user = User::create([
@@ -83,4 +93,3 @@ class AuthWebController extends Controller
         return redirect('/');
     }
 }
-

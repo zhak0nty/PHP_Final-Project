@@ -20,6 +20,15 @@ class TimeSlot extends Model
         'ends_at' => 'datetime',
     ];
 
+    /**
+     * Слоты строго после «сейчас» в часовом поясе приложения (APP_TIMEZONE).
+     * Сравнение с часовым поясом браузера в SQL давало пустые списки.
+     */
+    public function scopeFuture($query)
+    {
+        return $query->where('starts_at', '>', now());
+    }
+
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);
@@ -30,4 +39,3 @@ class TimeSlot extends Model
         return $this->hasMany(Appointment::class);
     }
 }
-
