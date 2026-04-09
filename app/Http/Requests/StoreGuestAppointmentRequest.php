@@ -26,9 +26,9 @@ class StoreGuestAppointmentRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'guest_name' => 'имя',
+            'guest_name' => 'name',
             'guest_email' => 'email',
-            'guest_phone' => 'номер телефона',
+            'guest_phone' => 'phone number',
         ];
     }
 }

@@ -1,55 +1,55 @@
 @extends('layouts.app')
 
-@section('title', 'Запись без регистрации — MedBooking')
+@section('title', 'Book without registration — MedBooking')
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
         <div class="mb-8">
-            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Запись без регистрации</h1>
-            <p class="mt-2 text-gray-600">Укажите имя, email и телефон, выберите врача и время. Запись сохранится на 5 минут — если зарегистрируетесь с этим email, она появится в личном кабинете.</p>
+            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Book without registration</h1>
+            <p class="mt-2 text-gray-600">Enter your name, email, and phone, then choose a doctor and time. The booking is held for 5 minutes — if you register with the same email, it will appear in your account.</p>
         </div>
 
-        <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr),minmax(0,3fr)] items-start">
-            <div class="space-y-6">
-                <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Данные для записи</h2>
-                    <form method="POST" action="{{ route('guest.booking.store') }}" class="space-y-5">
-                        @csrf
-                        <div>
-                            <label for="guest_name" class="block text-sm font-medium text-gray-700 mb-1.5">Имя</label>
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr),minmax(0,1fr)] items-start">
+            <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <form method="POST" action="{{ route('guest.booking.store') }}" class="space-y-5">
+                    @csrf
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Booking details</h2>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <label for="guest_name" class="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
                             <input id="guest_name" name="guest_name" type="text" value="{{ old('guest_name') }}" required
                                 class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors"
-                                placeholder="Иван Иванов">
+                                placeholder="Jane Doe">
                         </div>
                         <div>
                             <label for="guest_email" class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
                             <input id="guest_email" name="guest_email" type="email" value="{{ old('guest_email') }}" required
                                 class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors"
-                                placeholder="ivan@example.com">
+                                placeholder="you@example.com">
                         </div>
                         <div>
-                            <label for="guest_phone" class="block text-sm font-medium text-gray-700 mb-1.5">Номер телефона</label>
+                            <label for="guest_phone" class="block text-sm font-medium text-gray-700 mb-1.5">Phone number</label>
                             <input id="guest_phone" name="guest_phone" type="text" value="{{ old('guest_phone') }}" required
                                 class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors"
-                                placeholder="+7 (999) 123-45-67">
+                                placeholder="+1 555 000 0000">
                         </div>
-                        <div>
-                            <label for="doctor_id" class="block text-sm font-medium text-gray-700 mb-1.5">Врач</label>
+                        <div class="sm:col-span-2">
+                            <label for="doctor_id" class="block text-sm font-medium text-gray-700 mb-1.5">Doctor</label>
                             <select id="doctor_id" name="doctor_id" required
                                 class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors bg-white">
-                                <option value="">Выберите врача…</option>
+                                <option value="">Choose a doctor…</option>
                                 @foreach ($doctors as $doctor)
                                     <option value="{{ $doctor->id }}" @selected(old('doctor_id') == $doctor->id)>
-                                        {{ $doctor->user->name }} — {{ $doctor->specialization ?? 'Общий приём' }}
+                                        {{ $doctor->user->name }} — {{ $doctor->specialization ?? 'General practice' }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
-                        <div>
-                            <label for="service_id" class="block text-sm font-medium text-gray-700 mb-1.5">Услуга</label>
+                        <div class="sm:col-span-2">
+                            <label for="service_id" class="block text-sm font-medium text-gray-700 mb-1.5">Service</label>
                             <select id="service_id" name="service_id" required
                                 class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors bg-white">
-                                <option value="">Сначала выберите врача</option>
+                                <option value="">Select a doctor first</option>
                                 @foreach ($doctors as $doctor)
                                     @foreach ($doctor->services as $service)
                                         <option value="{{ $service->id }}" data-doctor-id="{{ $doctor->id }}" @selected(old('service_id') == $service->id)>
@@ -59,11 +59,11 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div>
-                            <label for="time_slot_id" class="block text-sm font-medium text-gray-700 mb-1.5">Время</label>
+                        <div class="sm:col-span-2">
+                            <label for="time_slot_id" class="block text-sm font-medium text-gray-700 mb-1.5">Time</label>
                             <select id="time_slot_id" name="time_slot_id" required
                                 class="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-[#6B21A8] focus:ring-2 focus:ring-[#6B21A8]/20 focus:outline-none transition-colors bg-white">
-                                <option value="">Сначала выберите врача</option>
+                                <option value="">Select a doctor first</option>
                                 @foreach ($doctors as $doctor)
                                     @foreach ($doctor->futureTimeSlots as $slot)
                                         <option value="{{ $slot->id }}" data-doctor-id="{{ $doctor->id }}" @selected(old('time_slot_id') == $slot->id)>
@@ -73,50 +73,44 @@
                                 @endforeach
                             </select>
                         </div>
-                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#6B21A8] px-4 py-3 text-sm font-medium text-white shadow-sm hover:bg-[#5B1B8A]">
-                            Записаться
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </button>
-                    </form>
-                </div>
+                    </div>
+                    <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#6B21A8] px-4 py-3 text-sm font-medium text-white shadow-sm hover:bg-[#5B1B8A] focus:outline-none focus:ring-2 focus:ring-[#6B21A8] focus:ring-offset-2 transition-colors">
+                        Book appointment
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </button>
+                </form>
+            </div>
 
+            <div class="space-y-6">
                 <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Врачи</h2>
-                    <div class="space-y-3 max-h-[320px] overflow-y-auto">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Doctors</h2>
+                    <div class="space-y-3 max-h-[360px] overflow-y-auto">
                         @foreach ($doctors as $doctor)
                             <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-4">
                                 <div class="font-medium text-gray-900">{{ $doctor->user->name }}</div>
-                                <div class="text-sm text-gray-500 mt-0.5">{{ $doctor->specialization ?? 'Общий приём' }}</div>
-                                <div class="flex flex-wrap gap-1.5 mt-2">
-                                    @foreach ($doctor->services as $service)
-                                        <span class="inline-flex rounded-lg bg-[#6B21A8]/10 px-2 py-0.5 text-xs font-medium text-[#6B21A8]">{{ $service->name }}</span>
-                                    @endforeach
-                                </div>
+                                <div class="text-sm text-gray-500 mt-0.5">{{ $doctor->specialization ?? 'General practice' }}</div>
                             </div>
                         @endforeach
                     </div>
                 </div>
-            </div>
 
-            <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Как это работает</h2>
-                <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex gap-3">
-                        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#6B21A8]/10 text-[#6B21A8] font-medium">1</span>
-                        Заполните форму — регистрация не нужна.
+                <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">How it works</h2>
+                <ol class="space-y-3 text-sm text-gray-600 list-decimal list-inside">
+                    <li>
+                        Fill out the form — no account required.
                     </li>
-                    <li class="flex gap-3">
-                        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#6B21A8]/10 text-[#6B21A8] font-medium">2</span>
-                        Запись сохраняется на <strong>5 минут</strong>. За это время выбранное время приёма удерживается за вами.
+                    <li>
+                        The booking is held for <strong>5 minutes</strong>. During that time the slot stays reserved for you.
                     </li>
-                    <li class="flex gap-3">
-                        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#6B21A8]/10 text-[#6B21A8] font-medium">3</span>
-                        Если вы <strong>зарегистрируетесь</strong> с тем же email — запись появится в личном кабинете и останется навсегда.
+                    <li>
+                        If you <strong>register</strong> with the same email — the booking appears in your account and stays there.
                     </li>
-                </ul>
-                <a href="{{ route('login') }}" class="mt-6 inline-flex items-center gap-2 rounded-xl border-2 border-[#6B21A8] bg-white px-4 py-2.5 text-sm font-medium text-[#6B21A8] hover:bg-[#6B21A8]/5 transition-colors">
-                    Уже есть аккаунт? Войти
-                </a>
+                </ol>
+                <p class="mt-4 text-sm text-gray-600">
+                    Already have an account? <a href="{{ route('login') }}" class="font-medium text-[#6B21A8] hover:underline">Log in</a>
+                </p>
+                </div>
             </div>
         </div>
     </div>
@@ -132,8 +126,8 @@
                 var servicePlaceholder = serviceSelect.querySelector('option[value=""]');
                 var timePlaceholder = timeSelect.querySelector('option[value=""]');
 
-                servicePlaceholder.textContent = doctorId ? 'Выберите услугу…' : 'Сначала выберите врача';
-                timePlaceholder.textContent = doctorId ? 'Выберите время…' : 'Сначала выберите врача';
+                servicePlaceholder.textContent = doctorId ? 'Choose a service…' : 'Select a doctor first';
+                timePlaceholder.textContent = doctorId ? 'Choose a time…' : 'Select a doctor first';
 
                 [].forEach.call(serviceSelect.options, function (opt) {
                     if (opt.value === '') return;

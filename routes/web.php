@@ -26,7 +26,7 @@ Route::post('/register', [AuthWebController::class, 'register']);
 
 Route::post('/logout', [AuthWebController::class, 'logout'])->name('logout');
 
-// Гостевая запись без регистрации
+// Guest booking without registration
 Route::get('/booking', [GuestBookingController::class, 'showForm'])->name('guest.booking.form');
 Route::post('/booking', [GuestBookingController::class, 'store'])->name('guest.booking.store');
 Route::get('/booking/success', function () {

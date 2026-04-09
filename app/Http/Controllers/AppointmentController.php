@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAppointmentRequest;
+use App\Http\Resources\AppointmentResource;
 use App\Models\Appointment;
 use App\Services\AppointmentService;
 use Illuminate\Http\Request;
@@ -11,8 +12,7 @@ class AppointmentController extends Controller
 {
     public function __construct(
         protected AppointmentService $appointmentService
-    ) {
-    }
+    ) {}
 
     public function indexForClient(Request $request)
     {
@@ -21,19 +21,19 @@ class AppointmentController extends Controller
             ->orderByDesc('created_at')
             ->paginate();
 
-        return $appointments;
+        return AppointmentResource::collection($appointments);
     }
 
     public function indexForDoctor(Request $request)
     {
         $doctor = $request->user()->doctor;
 
-        $appointments = Appointment::with('client', 'service', 'timeSlot')
+        $appointments = Appointment::with('client', 'service', 'timeSlot', 'doctor.user')
             ->where('doctor_id', $doctor?->id)
             ->orderByDesc('created_at')
             ->paginate();
 
-        return $appointments;
+        return AppointmentResource::collection($appointments);
     }
 
     public function store(StoreAppointmentRequest $request)
@@ -43,20 +43,21 @@ class AppointmentController extends Controller
             $request->validated()
         );
 
-        return response()->json($appointment->load('doctor.user', 'service', 'timeSlot'), 201);
+        return (new AppointmentResource(
+            $appointment->load('doctor.user', 'service', 'timeSlot')
+        ))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function cancel(Request $request, Appointment $appointment)
     {
-        if ($appointment->client_id !== $request->user()->id) {
-            return response()->json(['message' => 'Forbidden.'], 403);
-        }
+        $this->authorize('cancel', $appointment);
 
         $appointment->update([
             'status' => Appointment::STATUS_CANCELLED,
         ]);
 
-        return $appointment->load('doctor.user', 'service', 'timeSlot');
+        return new AppointmentResource($appointment->load('doctor.user', 'service', 'timeSlot'));
     }
 }
-

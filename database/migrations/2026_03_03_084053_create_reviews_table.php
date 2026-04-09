@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->string('kind')->default('review'); // review или complaint
+            $table->string('kind')->default('review'); // review or complaint
             $table->string('name')->nullable();
             $table->string('phone')->nullable();
             $table->text('text');

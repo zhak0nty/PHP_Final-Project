@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
+use App\Events\AppointmentCreated;
 use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\Service;
 use App\Models\TimeSlot;
 use App\Models\User;
-use App\Notifications\AppointmentCreatedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -27,7 +27,7 @@ class AppointmentService
 
         if (! $slot) {
             throw ValidationException::withMessages([
-                'time_slot_id' => ['Выбранное время недоступно или уже прошло.'],
+                'time_slot_id' => ['The selected time is unavailable or has already passed.'],
             ]);
         }
 
@@ -52,8 +52,7 @@ class AppointmentService
                 'status' => Appointment::STATUS_SCHEDULED,
             ]);
 
-            $doctor->user->notify(new AppointmentCreatedNotification($appointment));
-            $client->notify(new AppointmentCreatedNotification($appointment));
+            event(new AppointmentCreated($appointment));
 
             return $appointment;
         });
@@ -73,7 +72,7 @@ class AppointmentService
 
         if (! $slot) {
             throw ValidationException::withMessages([
-                'time_slot_id' => ['Выбранное время недоступно или уже прошло.'],
+                'time_slot_id' => ['The selected time is unavailable or has already passed.'],
             ]);
         }
 
@@ -102,7 +101,7 @@ class AppointmentService
                 'expires_at' => now()->addMinutes(5),
             ]);
 
-            $doctor->user->notify(new AppointmentCreatedNotification($appointment));
+            event(new AppointmentCreated($appointment));
 
             return $appointment;
         });

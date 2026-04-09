@@ -8,8 +8,8 @@ use App\Models\TimeSlot;
 class TimeSlotGenerator
 {
     /**
-     * Если в БД нет ни одного будущего слота (старый сид / пустая база),
-     * создаёт слоты на 30 дней вперёд для всех врачей.
+     * If there are no future slots in the database (old seed / empty DB),
+     * create slots for the next 30 days for all doctors.
      */
     public static function ensureUpcomingSlotsExist(): void
     {

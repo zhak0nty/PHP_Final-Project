@@ -22,16 +22,19 @@ class InfoPageController extends Controller
 
         $doctors = match ($slug) {
             'therapy' => $doctorsQuery
-                ->where('specialization', 'like', '%Терапев%')
+                ->where(function ($q) {
+                    $q->where('specialization', 'like', '%Therapist%')
+                        ->orWhere('specialization', 'like', '%General Practitioner%');
+                })
                 ->get(),
             'diagnostics' => $doctorsQuery
                 ->where(function ($q) {
-                    $q->where('specialization', 'like', '%УЗИ%')
-                        ->orWhere('specialization', 'like', '%КТ%')
-                        ->orWhere('specialization', 'like', '%МРТ%')
-                        ->orWhere('specialization', 'like', '%Рентген%')
-                        ->orWhere('specialization', 'like', '%Лучевая%')
-                        ->orWhere('specialization', 'like', '%Функциональ%');
+                    $q->where('specialization', 'like', '%Ultrasound%')
+                        ->orWhere('specialization', 'like', '%CT%')
+                        ->orWhere('specialization', 'like', '%MRI%')
+                        ->orWhere('specialization', 'like', '%X-Ray%')
+                        ->orWhere('specialization', 'like', '%Radiology%')
+                        ->orWhere('specialization', 'like', '%Functional%');
                 })
                 ->get(),
             'narrow-directions' => $doctorsQuery->get(),
@@ -66,105 +69,104 @@ class InfoPageController extends Controller
     {
         return [
             'consultation' => [
-                'title' => 'Консультация',
-                'lead' => 'Вы расскажете, что болит или беспокоит — врач посмотрит, объяснит и скажет, что делать дальше.',
+                'title' => 'Consultation',
+                'lead' => 'You describe what hurts or worries you — the doctor examines, explains, and tells you what to do next.',
                 'about' => [
-                    'Врач выслушает вас, задаст вопросы, при необходимости осмотрит.',
-                    'Потом объяснит простыми словами и при необходимости предложит анализы или порекомендует другого специалиста.',
+                    'The doctor listens, asks questions, and examines you if needed.',
+                    'Then they explain in plain language and may suggest tests or refer you to another specialist.',
                 ],
                 'cases' => [
-                    'Что-то болит или беспокоит, непонятно, к кому идти',
-                    'Температура, простуда, кашель',
-                    'Хочется проверить здоровье или получить второе мнение',
-                    'Нужно понять, какие обследования пройти',
+                    'Something hurts or bothers you and you are not sure which specialist to see',
+                    'Fever, cold, cough',
+                    'You want a check-up or a second opinion',
+                    'You need to know which tests to take',
                 ],
                 'equipment' => [
-                    ['title' => 'Что может понадобиться', 'text' => 'Анализы крови, УЗИ и другие исследования — только если врач решит, что они нужны.'],
-                    ['title' => 'Без лишнего', 'text' => 'Всё объяснят понятно, без сложных слов.'],
+                    ['title' => 'What you might need', 'text' => 'Blood tests, ultrasound, or other exams — only if the doctor decides they are necessary.'],
+                    ['title' => 'No unnecessary extras', 'text' => 'Everything is explained clearly, without jargon.'],
                 ],
             ],
             'diagnostics' => [
-                'title' => 'Диагностика',
-                'lead' => 'Обследования, которые помогают понять, что с организмом: анализы, УЗИ, снимки.',
+                'title' => 'Diagnostics',
+                'lead' => 'Examinations that help understand what is going on: lab tests, ultrasound, imaging.',
                 'about' => [
-                    'Диагностика — это когда вас проверяют: берут анализы, делают УЗИ или снимки, чтобы точнее понять причину недомогания.',
-                    'Врач назначает только то, что действительно нужно по вашим жалобам.',
+                    'Diagnostics means checking your body: blood tests, ultrasound, or scans to find the cause of symptoms.',
+                    'The doctor orders only what is really needed based on your complaints.',
                 ],
                 'cases' => [
-                    'Хочется пройти плановую проверку здоровья',
-                    'Есть симптомы — нужно выяснить причину',
-                    'Нужно проверить, помогает ли лечение',
-                    'Готовитесь к операции или процедуре',
+                    'Routine health screening',
+                    'Symptoms — you need to find the cause',
+                    'Checking whether treatment is working',
+                    'Preparing for surgery or a procedure',
                 ],
                 'equipment' => [
-                    ['title' => 'УЗИ', 'text' => 'Безболезненное обследование «по экрану» — смотрят внутренние органы.'],
-                    ['title' => 'КТ', 'text' => 'Снимки «послойно» — когда нужна особая точность.'],
-                    ['title' => 'МРТ', 'text' => 'Подробные снимки без рентгена — например суставы, позвоночник.'],
-                    ['title' => 'Анализы', 'text' => 'Кровь, моча и др. — по назначению врача.'],
+                    ['title' => 'Ultrasound', 'text' => 'Painless imaging on a screen — internal organs can be assessed.'],
+                    ['title' => 'CT', 'text' => 'Layered scans when high detail is required.'],
+                    ['title' => 'MRI', 'text' => 'Detailed imaging without X-rays — e.g. joints, spine.'],
+                    ['title' => 'Lab tests', 'text' => 'Blood, urine, etc. — as prescribed by the doctor.'],
                 ],
             ],
             'therapy' => [
-                'title' => 'Терапия',
-                'lead' => 'Приём у терапевта — врача «общего профиля», который разбирается в самых частых жалобах и при необходимости направит к узкому специалисту.',
+                'title' => 'Therapy',
+                'lead' => 'A visit to a therapist — a general doctor who handles common complaints and refers you to a specialist if needed.',
                 'about' => [
-                    'Терапевт — это врач, к которому идут, когда непонятно, что именно болит или к кому идти. Он осмотрит, при необходимости назначит анализы или УЗИ.',
-                    'Если нужен специалист по конкретной теме (ухо, горло, кожа и т.д.) — подскажет, к кому записаться.',
+                    'A therapist is who you see when you are not sure what hurts or whom to visit. They examine you and may order tests or ultrasound.',
+                    'If you need a focused specialist (ENT, skin, etc.), they will tell you whom to book.',
                 ],
                 'cases' => [
-                    'Простуда, кашель, температура',
-                    'Давление «скачет», сердце стучит сильнее обычного',
-                    'Слабость, кружится голова',
-                    'Болит живот, проблемы с желудком или кишечником',
+                    'Cold, cough, fever',
+                    'Blood pressure swings, palpitations',
+                    'Weakness, dizziness',
+                    'Stomach pain, digestive issues',
                 ],
                 'equipment' => [
-                    ['title' => 'На приёме', 'text' => 'Измерят давление, пульс, при необходимости сделают ЭКГ.'],
-                    ['title' => 'Если нужно уточнить', 'text' => 'Врач может назначить УЗИ или анализы.'],
+                    ['title' => 'At the visit', 'text' => 'Blood pressure, pulse, ECG if needed.'],
+                    ['title' => 'If more detail is needed', 'text' => 'The doctor may order ultrasound or lab tests.'],
                 ],
             ],
             'narrow-directions' => [
-                'title' => 'Узкие направления',
-                'lead' => 'Врачи по отдельным темам: горло и уши, кожа, женское здоровье, нервы и т.д. Выбираете специальность и записываетесь к нужному врачу.',
+                'title' => 'Specialist care',
+                'lead' => 'Doctors focused on one area: throat and ears, skin, women’s health, nerves, and more. Pick a specialty and book the right doctor.',
                 'about' => [
-                    'Узкий специалист — это врач, который занимается одной областью: например только ЛОР, только кожа или только гинекология.',
-                    'Вы можете посмотреть список врачей по специальностям и записаться к любому онлайн.',
+                    'A specialist focuses on one field — for example only ENT, only dermatology, or only gynecology.',
+                    'Browse the list by specialty and book online.',
                 ],
                 'cases' => [
-                    'Голова болит, немеют руки или ноги, плохо спится',
-                    'Вопросы по женскому здоровью, боли, сбой цикла',
-                    'Сыпь, зуд, что-то на коже',
-                    'Болит горло, ухо, заложен нос',
+                    'Headaches, numbness, sleep issues',
+                    'Women’s health, pain, cycle changes',
+                    'Rash, itching, skin concerns',
+                    'Sore throat, ear pain, blocked nose',
                 ],
                 'equipment' => [
-                    ['title' => 'Обследования', 'text' => 'При необходимости врач назначит анализы или снимки.'],
-                    ['title' => 'Связь с другими врачами', 'text' => 'Если нужно — подключат другого специалиста.'],
+                    ['title' => 'Examinations', 'text' => 'The doctor may order tests or imaging if needed.'],
+                    ['title' => 'Working with other doctors', 'text' => 'Another specialist can be involved if necessary.'],
                 ],
                 'cta' => [
-                    'title' => 'Выбрать врача',
-                    'text' => 'Откройте список специалистов и запишитесь — можно без регистрации.',
+                    'title' => 'Choose a doctor',
+                    'text' => 'Open the specialists list and book — no account required.',
                 ],
             ],
             'online-booking' => [
-                'title' => 'Запись онлайн',
-                'lead' => 'Выбираете врача и время в интернете, вводите имя, почту и телефон — запись готова. Регистрация не обязательна.',
+                'title' => 'Online booking',
+                'lead' => 'Pick a doctor and time online, enter your name, email, and phone — your appointment is set. Registration is optional.',
                 'about' => [
-                    'Нужны только имя, email и телефон. Пароль и аккаунт не нужны.',
-                    'Время бронируется на 5 минут. Если потом зарегистрируетесь с этой же почтой — запись появится в личном кабинете.',
+                    'You only need name, email, and phone. No password required.',
+                    'The slot is held for 5 minutes. If you later register with the same email, the booking appears in your account.',
                 ],
                 'cases' => [
-                    'Хочется записаться быстро, без создания аккаунта',
-                    'Удобно самому выбрать день и время',
-                    'Нужно просто занять время и подтвердить позже',
+                    'Quick booking without creating an account',
+                    'You choose the day and time yourself',
+                    'Hold a slot and confirm later',
                 ],
                 'equipment' => [
-                    ['title' => 'Занятое время', 'text' => 'Система не даст записаться на время, которое уже занято.'],
-                    ['title' => 'Врач в курсе', 'text' => 'Врач увидит вашу запись и будет ждать вас.'],
+                    ['title' => 'Busy slots', 'text' => 'The system will not let you book a time that is already taken.'],
+                    ['title' => 'Doctor is informed', 'text' => 'Your doctor will see the booking and expect you.'],
                 ],
                 'cta' => [
-                    'title' => 'Записаться',
-                    'text' => 'Нажмите кнопку ниже и заполните короткую форму — это займёт минуту.',
+                    'title' => 'Book now',
+                    'text' => 'Use the button below and fill in a short form — about a minute.',
                 ],
             ],
         ];
     }
 }
-

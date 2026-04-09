@@ -16,7 +16,7 @@ class AuthWebController extends Controller
 
     public function showLoginForm()
     {
-        // Как и регистрация: только клиентов отправляем в кабинет; админ/врач видит форму входа.
+        // Same as register: only clients go to the dashboard; admin/doctor sees the login form.
         if (Auth::check() && Auth::user()->isClient()) {
             return redirect()->intended(route('dashboard'));
         }
@@ -26,8 +26,8 @@ class AuthWebController extends Controller
 
     public function showRegisterForm()
     {
-        // Уже клиент — в кабинет. Админ/врач остаётся на форме регистрации клиента
-        // (гостевая запись → «Зарегистрироваться»), иначе редирект вёл в админ-панель.
+        // Already a client — dashboard. Admin/doctor stays on client registration
+        // (guest booking → Register); otherwise redirect would send them to admin.
         if (Auth::check() && Auth::user()->isClient()) {
             return redirect()->intended(route('dashboard'));
         }
@@ -44,7 +44,7 @@ class AuthWebController extends Controller
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
-                ->withErrors(['email' => 'Неверный email или пароль.'])
+                ->withErrors(['email' => 'Invalid email or password.'])
                 ->onlyInput('email');
         }
 
@@ -65,7 +65,7 @@ class AuthWebController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [
-            'email.unique' => 'Этот email уже зарегистрирован. Войдите под этим адресом — гостевая запись привяжется к аккаунту.',
+            'email.unique' => 'This email is already registered. Sign in with it — your guest booking will be linked to your account.',
         ]);
 
         $user = User::create([

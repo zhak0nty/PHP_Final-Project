@@ -1,8 +1,8 @@
 ## Medical / Beauty Booking API (Laravel)
 
-API‑система записи к врачу/мастеру на Laravel 12 с аутентификацией через Sanctum, ролями (admin/doctor/client), CRUD сущностями и базовыми тестами.
+Laravel 13 doctor booking API with Sanctum authentication, roles (admin/doctor/client), CRUD resources, and basic tests.
 
-### Запуск проекта
+### Running the project
 
 ```bash
 git clone <repo>
@@ -10,65 +10,65 @@ cd php
 cp .env.example .env
 php artisan key:generate
 
-# создать SQLite файл (если ещё нет)
+# Create the SQLite file if it does not exist yet
 touch database/database.sqlite
 
 php artisan migrate --seed
 php artisan serve
 ```
 
-По умолчанию используются учётные записи:
+Default demo accounts:
 
 - **Admin**: `admin@example.com` / `password`
 - **Client**: `client@example.com` / `password`
-- **Doctors**: `doctor1@example.com`, `doctor2@example.com`, `doctor3@example.com` / `password`
+- **Doctors**: `doctor1@example.com` … `doctor15@example.com` / `password`
 
-### Аутентификация
+### Authentication
 
-Все защищённые эндпоинты используют **Bearer Sanctum token**.
+Protected endpoints expect a **Bearer Sanctum token**.
 
-- **POST** `/api/register` — регистрация клиента  
+- **POST** `/api/register` — client registration  
   - body: `{ "name", "email", "password", "password_confirmation" }`  
-  - response: `{ token, user }`
-- **POST** `/api/login` — логин  
+  - response: `{ token, user }` (`user` is a flat JSON object from `UserResource`)
+- **POST** `/api/login` — login  
   - body: `{ "email", "password" }`  
   - response: `{ token, user }`
-- **POST** `/api/logout` — выход (требуется Bearer token)
+- **POST** `/api/logout` — logout (Bearer token required)
 
-Заголовок авторизации:
+Authorization header:
 
 ```http
 Authorization: Bearer <token>
 Accept: application/json
 ```
 
-### Роли и доступ
+### Roles and access
 
-- `admin` — управление врачами, услугами, слотами (`/api/doctors`, `/api/services`, `/api/time-slots`)
-- `doctor` — просмотр своих записей (`/api/doctor/appointments`)
-- `client` — создание/просмотр/отмена записей (`/api/appointments`)
+- `admin` — manage doctors, services, and slots (`/api/doctors`, `/api/services`, `/api/time-slots`)
+- `doctor` — view own appointments (`/api/doctor/appointments`)
+- `client` — create, view, and cancel appointments (`/api/appointments`)
 
-При отсутствии прав возвращается **403 Forbidden** с JSON `{ "message": "Forbidden." }`.
+Insufficient permissions return **403 Forbidden** with JSON `{ "message": "Forbidden." }`.
 
-### Основные сущности и связи
+### Core entities and relationships
 
-- `users` — все пользователи, поле `role` (`admin`, `doctor`, `client`)
-- `doctors` — профиль врача, `user_id` (One‑to‑One: user↔doctor)
-- `services` — услуги
+- `users` — all users; `role` is `admin`, `doctor`, or `client`
+- `doctors` — doctor profile, `user_id` (One‑to‑One: user↔doctor)
+- `services` — services
 - `doctor_service` — pivot (Many‑to‑Many: doctors↔services)
-- `time_slots` — слоты расписания врача (One‑to‑Many: doctor→time_slots)
-- `appointments` — записи (One‑to‑Many: doctor→appointments, client(user)→appointments)
+- `time_slots` — schedule slots for a doctor (One‑to‑Many: doctor→time_slots)
+- `appointments` — bookings (One‑to‑Many: doctor→appointments, client(user)→appointments)
 
-### CRUD эндпоинты
+### CRUD endpoints
 
-#### Admin (требует роль `admin`)
+#### Admin (requires `admin` role)
 
 - **Doctors** `/api/doctors`
-  - `GET /api/doctors` — список
-  - `POST /api/doctors` — создать врача (поля: `user_id`, `specialization?`, `bio?`)
-  - `GET /api/doctors/{id}` — показать
-  - `PUT/PATCH /api/doctors/{id}` — обновить
-  - `DELETE /api/doctors/{id}` — удалить
+  - `GET /api/doctors` — list
+  - `POST /api/doctors` — create (`user_id`, `specialization?`, `bio?`)
+  - `GET /api/doctors/{id}` — show
+  - `PUT/PATCH /api/doctors/{id}` — update
+  - `DELETE /api/doctors/{id}` — delete
 
 - **Services** `/api/services`
   - `GET /api/services`
@@ -84,64 +84,77 @@ Accept: application/json
   - `PUT/PATCH /api/time-slots/{id}`
   - `DELETE /api/time-slots/{id}`
 
-#### Client (роль `client`)
+#### Client (`client` role)
 
 - **Appointments**
-  - `GET /api/appointments` — список своих записей
-  - `POST /api/appointments` — создать запись
+  - `GET /api/appointments` — list own appointments
+  - `POST /api/appointments` — create
     - body: `{ "doctor_id", "service_id", "time_slot_id" }`
-  - `POST /api/appointments/{id}/cancel` — отменить (status → `cancelled`)
+  - `POST /api/appointments/{id}/cancel` — cancel (status → `cancelled`)
 
-#### Doctor (роль `doctor`)
+#### Doctor (`doctor` role)
 
-- `GET /api/doctor/appointments` — список записей к врачу.
+- `GET /api/doctor/appointments` — appointments for this doctor.
 
-### Валидация и ошибки
+### Validation and errors
 
-Используются Form Request классы:
+Form Request classes:
 
 - `StoreDoctorRequest`
 - `StoreServiceRequest`
 - `StoreTimeSlotRequest`
 - `StoreAppointmentRequest`
 
-Основные проверки:
+Main rules:
 
-- слоты: `starts_at` не в прошлом, `ends_at` позже `starts_at`
-- при создании записи:
-  - слот существует и принадлежит врачу
-  - слот не в прошлом
-  - нет другой записи со статусом `scheduled` на этот слот
-  - услуга существует и врач её оказывает
+- slots: `starts_at` not in the past, `ends_at` after `starts_at`
+- when creating an appointment:
+  - slot exists and belongs to the doctor
+  - slot is not in the past
+  - no other `scheduled` appointment for that slot
+  - service exists and the doctor offers it
 
-Коды ошибок:
+Error codes:
 
-- **422** — ошибки валидации (JSON с полем `errors`)
-- **403** — нет роли/доступа
-- **404** — ресурс не найден
+- **422** — validation errors (JSON `errors`)
+- **403** — wrong role or access
+- **404** — resource not found
 
 ### Notifications
 
-При успешном создании записи:
+After a successful booking, an `AppointmentCreated` event runs; a **queued job** (`NotifyAppointmentParticipants`) sends `AppointmentCreatedNotification` to the **doctor** (and to the **client** when `client_id` is set). Channel is `database` (no email/SMS). For async processing set `QUEUE_CONNECTION=database` (or `redis`) and run `php artisan queue:work`.
 
-- в `notifications` добавляются записи для **врача** и **клиента**
-- канал — `database` (никаких email/SMS)
+### API JSON shape
 
-### Тесты
+Single-model responses use Laravel **API Resources** and are wrapped in a top-level `data` key (e.g. `POST /api/appointments`, `GET /api/doctors/{id}`). Paginated lists return `data`, `links`, and `meta`. Register/login responses keep `user` as a plain object (no extra `data` wrapper).
 
-Запуск:
+### Laravel patterns in this repo
+
+| Pattern | Where |
+|--------|--------|
+| **API Resources** | `app/Http/Resources/*Resource.php` |
+| **Policy** | `AppointmentPolicy` — `cancel` only for the appointment owner (client) |
+| **Event + listener** | `AppointmentCreated` → `DispatchAppointmentNotificationJob` |
+| **Queue / job** | `NotifyAppointmentParticipants` implements `ShouldQueue` |
+| **Service layer** | `AppointmentService` (business rules + transactions) |
+| **Pivot** | `doctor_service` (many-to-many doctors ↔ services) |
+
+### Tests
+
+Run:
 
 ```bash
 php artisan test
 ```
 
-Покрыто feature‑тестами:
+Covered by feature tests:
 
-1. Регистрация + получение токена
-2. Логин + получение токена
-3. Клиент может создать запись
-4. Нельзя создать запись на занятый слот
-5. Клиент не может создавать doctor/service (403)
+1. Registration and token
+2. Login and token
+3. Client can create an appointment
+4. Cannot book an occupied slot
+5. Client cannot create doctor/service (403)
+6. Client can cancel own appointment; cannot cancel someone else’s (policy)
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 

@@ -21,8 +21,8 @@ class TimeSlot extends Model
     ];
 
     /**
-     * Слоты строго после «сейчас» в часовом поясе приложения (APP_TIMEZONE).
-     * Сравнение с часовым поясом браузера в SQL давало пустые списки.
+     * Slots strictly after "now" in the application timezone (APP_TIMEZONE).
+     * Comparing with the browser timezone in SQL produced empty lists.
      */
     public function scopeFuture($query)
     {

@@ -4,8 +4,6 @@ namespace App\Notifications;
 
 use App\Models\Appointment;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class AppointmentCreatedNotification extends Notification
@@ -14,8 +12,7 @@ class AppointmentCreatedNotification extends Notification
 
     public function __construct(
         protected Appointment $appointment
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -34,4 +31,3 @@ class AppointmentCreatedNotification extends Notification
         ];
     }
 }
-

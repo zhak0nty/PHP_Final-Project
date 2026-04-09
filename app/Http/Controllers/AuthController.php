@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +29,7 @@ class AuthController extends Controller
 
         return response()->json([
             'token' => $token,
-            'user' => $user,
+            'user' => (new UserResource($user))->resolve($request),
         ], 201);
     }
 
@@ -52,7 +53,7 @@ class AuthController extends Controller
 
         return response()->json([
             'token' => $token,
-            'user' => $user,
+            'user' => (new UserResource($user))->resolve($request),
         ]);
     }
 
@@ -66,4 +67,3 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out']);
     }
 }
-

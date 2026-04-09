@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Специалисты — MedBooking')
+@section('title', 'Specialists — MedBooking')
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div class="mb-8">
-            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Специалисты</h1>
-            <p class="mt-2 text-gray-600">Наши врачи и направления. Запись доступна без регистрации.</p>
+            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Specialists</h1>
+            <p class="mt-2 text-gray-600">Our doctors and areas of focus. Booking is available without registration.</p>
         </div>
 
         @if ($doctors->isEmpty())
-            <p class="text-gray-500">Пока нет специалистов в базе.</p>
+            <p class="text-gray-500">No specialists in the database yet.</p>
         @else
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($doctors as $doctor)
@@ -20,8 +20,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
                         </div>
-                        <h2 class="text-lg font-semibold text-gray-900">{{ $doctor->user->name ?? 'Врач' }}</h2>
-                        <p class="mt-1 text-sm text-gray-600">{{ $doctor->specialization ?? 'Общий приём' }}</p>
+                        <h2 class="text-lg font-semibold text-gray-900">{{ $doctor->user->name ?? 'Doctor' }}</h2>
+                        <p class="mt-1 text-sm text-gray-600">{{ $doctor->specialization ?? 'General practice' }}</p>
                         @if ($doctor->services->isNotEmpty())
                             <div class="flex flex-wrap gap-1.5 mt-3">
                                 @foreach ($doctor->services as $service)
@@ -30,7 +30,7 @@
                             </div>
                         @endif
                         <a href="{{ route('guest.booking.form') }}" class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[#6B21A8] hover:underline">
-                            Записаться
+                            Book
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     </div>
@@ -40,7 +40,7 @@
 
         <div class="mt-10 text-center">
             <a href="{{ route('guest.booking.form') }}" class="inline-flex items-center gap-2 rounded-xl bg-[#6B21A8] px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-[#5B1B8A] transition-colors">
-                Записаться к специалисту
+                Book a specialist
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </a>
         </div>

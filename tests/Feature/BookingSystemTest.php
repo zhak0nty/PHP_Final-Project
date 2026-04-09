@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Appointment;
 use App\Models\Doctor;
-use App\Models\Service;
 use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -67,7 +66,7 @@ class BookingSystemTest extends TestCase
         ]);
 
         $response->assertCreated()
-            ->assertJsonPath('status', Appointment::STATUS_SCHEDULED);
+            ->assertJsonPath('data.status', Appointment::STATUS_SCHEDULED);
     }
 
     public function test_cannot_book_taken_time_slot(): void
@@ -116,5 +115,56 @@ class BookingSystemTest extends TestCase
             'duration_minutes' => 30,
         ])->assertStatus(403);
     }
-}
 
+    public function test_client_can_cancel_own_appointment(): void
+    {
+        $this->seed();
+
+        $client = User::where('role', User::ROLE_CLIENT)->firstOrFail();
+        $doctor = Doctor::firstOrFail();
+        $service = $doctor->services()->firstOrFail();
+        $slot = TimeSlot::where('doctor_id', $doctor->id)->firstOrFail();
+
+        Sanctum::actingAs($client);
+
+        $created = $this->postJson('/api/appointments', [
+            'doctor_id' => $doctor->id,
+            'service_id' => $service->id,
+            'time_slot_id' => $slot->id,
+        ])->assertCreated();
+
+        $id = $created->json('data.id');
+
+        $this->postJson("/api/appointments/{$id}/cancel")
+            ->assertOk()
+            ->assertJsonPath('data.status', Appointment::STATUS_CANCELLED);
+    }
+
+    public function test_client_cannot_cancel_another_clients_appointment(): void
+    {
+        $this->seed();
+
+        $owner = User::where('role', User::ROLE_CLIENT)->firstOrFail();
+        $otherClient = User::factory()->create([
+            'role' => User::ROLE_CLIENT,
+        ]);
+        $doctor = Doctor::firstOrFail();
+        $service = $doctor->services()->firstOrFail();
+        $slot = TimeSlot::where('doctor_id', $doctor->id)->firstOrFail();
+
+        Sanctum::actingAs($owner);
+
+        $created = $this->postJson('/api/appointments', [
+            'doctor_id' => $doctor->id,
+            'service_id' => $service->id,
+            'time_slot_id' => $slot->id,
+        ])->assertCreated();
+
+        $id = $created->json('data.id');
+
+        Sanctum::actingAs($otherClient);
+
+        $this->postJson("/api/appointments/{$id}/cancel")
+            ->assertForbidden();
+    }
+}

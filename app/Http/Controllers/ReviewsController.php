@@ -51,12 +51,11 @@ class ReviewsController extends Controller
         ]);
 
         $message = $kind === 'complaint'
-            ? 'Спасибо! Мы учтём ваше предложение.'
-            : 'Спасибо за отзыв!';
+            ? 'Thank you! We will take your feedback into account.'
+            : 'Thank you for your review!';
 
         return redirect()
             ->route('reviews.index')
             ->with('status', $message);
     }
 }
-

@@ -3,33 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTimeSlotRequest;
+use App\Http\Resources\TimeSlotResource;
 use App\Models\TimeSlot;
-use Illuminate\Http\Request;
 
 class TimeSlotController extends Controller
 {
     public function index()
     {
-        return TimeSlot::with('doctor.user')->paginate();
+        return TimeSlotResource::collection(TimeSlot::with('doctor.user')->paginate());
     }
 
     public function store(StoreTimeSlotRequest $request)
     {
         $slot = TimeSlot::create($request->validated());
 
-        return response()->json($slot->load('doctor.user'), 201);
+        return (new TimeSlotResource($slot->load('doctor.user')))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function show(TimeSlot $timeSlot)
     {
-        return $timeSlot->load('doctor.user');
+        return new TimeSlotResource($timeSlot->load('doctor.user'));
     }
 
     public function update(StoreTimeSlotRequest $request, TimeSlot $timeSlot)
     {
         $timeSlot->update($request->validated());
 
-        return $timeSlot->load('doctor.user');
+        return new TimeSlotResource($timeSlot->load('doctor.user'));
     }
 
     public function destroy(TimeSlot $timeSlot)
@@ -39,4 +41,3 @@ class TimeSlotController extends Controller
         return response()->json([], 204);
     }
 }
-

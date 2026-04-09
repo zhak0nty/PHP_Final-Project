@@ -1,8 +1,15 @@
+# Image versions are pinned for reproducible builds.
+# PHP / Node: ARG in Dockerfile; MySQL and Nginx: image tags below.
+# App env: root .env file (mounted into the app container).
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_APP_NAME: "${VITE_APP_NAME:-MedBooking}"
+    image: medbooking-app:latest
     container_name: medbooking-app
     restart: unless-stopped
     working_dir: /var/www/html
@@ -10,49 +17,50 @@ services:
       - .:/var/www/html
       - storage_data:/var/www/html/storage
     environment:
-      - APP_ENV=${APP_ENV:-production}
-      - APP_DEBUG=${APP_DEBUG:-false}
-      - APP_URL=${APP_URL:-http://localhost}
-      - DB_CONNECTION=mysql
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE:-medbooking}
-      - DB_USERNAME=${DB_USERNAME:-medbooking}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      APP_ENV: "${APP_ENV:-production}"
+      APP_DEBUG: "${APP_DEBUG:-false}"
+      APP_URL: "${APP_URL:-http://localhost:8000}"
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_DATABASE: "${DB_DATABASE:-medbooking}"
+      DB_USERNAME: "${DB_USERNAME:-medbooking}"
+      DB_PASSWORD: "${DB_PASSWORD:-secret}"
     depends_on:
       mysql:
         condition: service_healthy
 
   nginx:
-    image: nginx:alpine
+    image: nginx:1.27.4-alpine
     container_name: medbooking-nginx
     restart: unless-stopped
     ports:
-      - "8000:80"
+      - "${HTTP_PORT:-8000}:80"
     volumes:
       - .:/var/www/html
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - app
 
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0.40
     container_name: medbooking-mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-medbooking}
-      MYSQL_USER: ${DB_USERNAME:-medbooking}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_DATABASE: "${DB_DATABASE:-medbooking}"
+      MYSQL_USER: "${DB_USERNAME:-medbooking}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-secret}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-secret}"
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-3306}:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
 volumes:
   mysql_data:

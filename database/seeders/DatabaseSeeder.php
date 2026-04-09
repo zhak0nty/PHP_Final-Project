@@ -25,33 +25,32 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $services = collect([
-            ['name' => 'Консультация', 'duration_minutes' => 30],
-            ['name' => 'Первичный приём', 'duration_minutes' => 45],
-            ['name' => 'Повторный приём', 'duration_minutes' => 30],
-            ['name' => 'Диагностика', 'duration_minutes' => 60],
-            ['name' => 'УЗИ', 'duration_minutes' => 45],
+            ['name' => 'Consultation', 'duration_minutes' => 30],
+            ['name' => 'First visit', 'duration_minutes' => 45],
+            ['name' => 'Follow-up', 'duration_minutes' => 30],
+            ['name' => 'Diagnostics', 'duration_minutes' => 60],
+            ['name' => 'Ultrasound', 'duration_minutes' => 45],
         ])->map(fn (array $data) => Service::create([
             'name' => $data['name'],
             'duration_minutes' => $data['duration_minutes'],
         ]));
 
-        // Врачи по данным с emirmed.kz/ru/specialists/
         $doctorsData = [
-            ['name' => 'Абдиев Габит Серикович', 'specialization' => 'Уролог'],
-            ['name' => 'Абдулл Рашид Именжанулы', 'specialization' => 'Терапевт'],
-            ['name' => 'Аманжолов Бахтияр Рахимович', 'specialization' => 'Эндоскопист'],
-            ['name' => 'Байболов Канат Заутбекович', 'specialization' => 'Невропатолог / Невролог'],
-            ['name' => 'Байкенже Бибигуль Сериковна', 'specialization' => 'Гинеколог'],
-            ['name' => 'Бектасова Майра Асылбековна', 'specialization' => 'ЛОР / Оториноларинголог'],
-            ['name' => 'Даулеткулов Нуржан Мейрамбекович', 'specialization' => 'Травматолог'],
-            ['name' => 'Джусанбаева Асель Сагатовна', 'specialization' => 'Дерматолог'],
-            ['name' => 'Маткасимов Рустем Жанатбекович', 'specialization' => 'Врач общей практики (ВОП)'],
-            ['name' => 'Саяндинова Назгуль Абильевна', 'specialization' => 'Педиатр'],
-            ['name' => 'Сыдыкова Гульнара Жарылкасиновна', 'specialization' => 'Невропатолог / Невролог'],
-            ['name' => 'Ахмеджанов Данияр Даулетбекович', 'specialization' => 'Офтальмолог / Окулист'],
-            ['name' => 'Агманова Бибигул Сериковна', 'specialization' => 'Кардиолог'],
-            ['name' => 'Токаева Гульнара Сагиналыевна', 'specialization' => 'Эндокринолог'],
-            ['name' => 'Байдаулетов Жомарт Жумабаевич', 'specialization' => 'Хирург'],
+            ['name' => 'James Wilson', 'specialization' => 'Urologist'],
+            ['name' => 'Sarah Miller', 'specialization' => 'Therapist'],
+            ['name' => 'Robert Chen', 'specialization' => 'Endoscopist'],
+            ['name' => 'Emily Davis', 'specialization' => 'Neurologist'],
+            ['name' => 'Lisa Anderson', 'specialization' => 'Gynecologist'],
+            ['name' => 'Michael Brown', 'specialization' => 'ENT / Otolaryngologist'],
+            ['name' => 'David Lee', 'specialization' => 'Traumatologist'],
+            ['name' => 'Anna Garcia', 'specialization' => 'Dermatologist'],
+            ['name' => 'Thomas White', 'specialization' => 'General Practitioner (GP)'],
+            ['name' => 'Maria Martinez', 'specialization' => 'Pediatrician'],
+            ['name' => 'Paul Johnson', 'specialization' => 'Neurologist'],
+            ['name' => 'Chris Taylor', 'specialization' => 'Ophthalmologist'],
+            ['name' => 'Jennifer Moore', 'specialization' => 'Cardiologist'],
+            ['name' => 'Kevin Harris', 'specialization' => 'Endocrinologist'],
+            ['name' => 'Alex Reed', 'specialization' => 'Diagnostic Imaging (Ultrasound, CT, MRI)'],
         ];
 
         $doctors = collect($doctorsData)->map(function (array $data, int $i) use ($services) {
