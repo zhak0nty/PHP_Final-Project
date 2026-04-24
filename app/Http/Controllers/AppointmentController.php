@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAppointmentRequest;
+use App\Http\Requests\UpdateAppointmentRequest;
 use App\Http\Resources\AppointmentResource;
 use App\Models\Appointment;
 use App\Services\AppointmentService;
@@ -14,7 +15,7 @@ class AppointmentController extends Controller
         protected AppointmentService $appointmentService
     ) {}
 
-    public function indexForClient(Request $request)
+    public function index(Request $request)
     {
         $appointments = Appointment::with('doctor.user', 'service', 'timeSlot')
             ->where('client_id', $request->user()->id)
@@ -22,6 +23,13 @@ class AppointmentController extends Controller
             ->paginate();
 
         return AppointmentResource::collection($appointments);
+    }
+
+    public function show(Request $request, Appointment $appointment): AppointmentResource
+    {
+        $this->authorize('view', $appointment);
+
+        return new AppointmentResource($appointment->load('doctor.user', 'service', 'timeSlot'));
     }
 
     public function indexForDoctor(Request $request)
@@ -48,6 +56,28 @@ class AppointmentController extends Controller
         ))
             ->response()
             ->setStatusCode(201);
+    }
+
+    public function update(UpdateAppointmentRequest $request, Appointment $appointment): AppointmentResource
+    {
+        $this->authorize('update', $appointment);
+
+        $appointment = $this->appointmentService->rescheduleAppointment(
+            $request->user(),
+            $appointment,
+            $request->validated()
+        );
+
+        return new AppointmentResource($appointment->load('doctor.user', 'service', 'timeSlot'));
+    }
+
+    public function destroy(Request $request, Appointment $appointment)
+    {
+        $this->authorize('delete', $appointment);
+
+        $appointment->delete();
+
+        return response()->noContent();
     }
 
     public function cancel(Request $request, Appointment $appointment)

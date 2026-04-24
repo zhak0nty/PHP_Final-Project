@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Appointment;
 use App\Models\Doctor;
+use App\Models\Review;
 use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -166,5 +167,76 @@ class BookingSystemTest extends TestCase
 
         $this->postJson("/api/appointments/{$id}/cancel")
             ->assertForbidden();
+    }
+
+    public function test_client_can_show_update_and_delete_own_appointment(): void
+    {
+        $this->seed();
+
+        $client = User::where('role', User::ROLE_CLIENT)->firstOrFail();
+        $doctor = Doctor::firstOrFail();
+        $service = $doctor->services()->firstOrFail();
+        $slots = TimeSlot::where('doctor_id', $doctor->id)->orderBy('starts_at')->take(2)->get();
+
+        Sanctum::actingAs($client);
+
+        $created = $this->postJson('/api/appointments', [
+            'doctor_id' => $doctor->id,
+            'service_id' => $service->id,
+            'time_slot_id' => $slots[0]->id,
+        ])->assertCreated();
+
+        $id = $created->json('data.id');
+
+        $this->getJson("/api/appointments/{$id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $id);
+
+        $this->putJson("/api/appointments/{$id}", [
+            'doctor_id' => $doctor->id,
+            'service_id' => $service->id,
+            'time_slot_id' => $slots[1]->id,
+        ])->assertOk()
+            ->assertJsonPath('data.time_slot_id', $slots[1]->id);
+
+        $this->deleteJson("/api/appointments/{$id}")
+            ->assertNoContent();
+    }
+
+    public function test_admin_has_full_reviews_crud_in_api(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $created = $this->postJson('/api/reviews', [
+            'kind' => 'review',
+            'name' => 'API Tester',
+            'phone' => '+100000000',
+            'text' => 'Great doctor and service.',
+        ])->assertCreated();
+
+        $id = $created->json('data.id');
+
+        $this->getJson('/api/reviews')
+            ->assertOk()
+            ->assertJsonStructure(['data', 'links', 'meta']);
+
+        $this->getJson("/api/reviews/{$id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $id);
+
+        $this->patchJson("/api/reviews/{$id}", [
+            'text' => 'Updated feedback',
+        ])->assertOk()
+            ->assertJsonPath('data.text', 'Updated feedback');
+
+        $this->deleteJson("/api/reviews/{$id}")
+            ->assertNoContent();
+
+        $this->assertDatabaseMissing('reviews', ['id' => $id]);
+        $this->assertTrue(Review::query()->whereKey($id)->doesntExist());
     }
 }

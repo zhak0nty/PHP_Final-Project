@@ -6,6 +6,7 @@ use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TimeSlotController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ReviewController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -20,14 +21,18 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:client')->group(function () {
-        Route::get('appointments', [AppointmentController::class, 'indexForClient']);
-        Route::post('appointments', [AppointmentController::class, 'store']);
+        Route::apiResource('appointments', AppointmentController::class)
+            ->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::post('appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
             ->name('appointments.cancel');
     });
 
     Route::middleware('role:doctor')->group(function () {
         Route::get('doctor/appointments', [AppointmentController::class, 'indexForDoctor']);
+    });
+
+    Route::middleware('role:admin')->group(function () {
+        Route::apiResource('reviews', ReviewController::class);
     });
 });
 

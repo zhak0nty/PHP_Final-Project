@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePublicReviewRequest;
 use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ReviewsController extends Controller
@@ -20,18 +20,9 @@ class ReviewsController extends Controller
         return view('reviews.index', compact('reviews'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StorePublicReviewRequest $request): RedirectResponse
     {
         $kind = $request->input('kind', 'review');
-
-        $request->validate([
-            'name' => ['nullable', 'string', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:255'],
-            'text' => ['required_without:complaint_text', 'nullable', 'string', 'max:2000'],
-            'complaint_name' => ['required_if:kind,complaint', 'string', 'max:255'],
-            'complaint_phone' => ['nullable', 'string', 'max:255'],
-            'complaint_text' => ['required_without:text', 'nullable', 'string', 'max:2000'],
-        ]);
 
         if ($kind === 'complaint') {
             $text = $request->input('complaint_text');

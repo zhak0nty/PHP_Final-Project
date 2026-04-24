@@ -44,7 +44,7 @@ Accept: application/json
 
 ### Roles and access
 
-- `admin` — manage doctors, services, and slots (`/api/doctors`, `/api/services`, `/api/time-slots`)
+- `admin` — manage doctors, services, slots, and reviews (`/api/doctors`, `/api/services`, `/api/time-slots`, `/api/reviews`)
 - `doctor` — view own appointments (`/api/doctor/appointments`)
 - `client` — create, view, and cancel appointments (`/api/appointments`)
 
@@ -84,12 +84,22 @@ Insufficient permissions return **403 Forbidden** with JSON `{ "message": "Forbi
   - `PUT/PATCH /api/time-slots/{id}`
   - `DELETE /api/time-slots/{id}`
 
+- **Reviews** `/api/reviews`
+  - `GET /api/reviews`
+  - `POST /api/reviews` (`kind?`, `name?`, `phone?`, `text`)
+  - `GET /api/reviews/{id}`
+  - `PUT/PATCH /api/reviews/{id}`
+  - `DELETE /api/reviews/{id}`
+
 #### Client (`client` role)
 
 - **Appointments**
   - `GET /api/appointments` — list own appointments
   - `POST /api/appointments` — create
     - body: `{ "doctor_id", "service_id", "time_slot_id" }`
+  - `GET /api/appointments/{id}` — show own appointment
+  - `PUT/PATCH /api/appointments/{id}` — reschedule own appointment
+  - `DELETE /api/appointments/{id}` — delete own appointment
   - `POST /api/appointments/{id}/cancel` — cancel (status → `cancelled`)
 
 #### Doctor (`doctor` role)
@@ -104,6 +114,12 @@ Form Request classes:
 - `StoreServiceRequest`
 - `StoreTimeSlotRequest`
 - `StoreAppointmentRequest`
+- `UpdateAppointmentRequest`
+- `RegisterRequest`
+- `LoginRequest`
+- `StorePublicReviewRequest`
+- `StoreReviewRequest`
+- `UpdateReviewRequest`
 
 Main rules:
 
@@ -133,7 +149,7 @@ Single-model responses use Laravel **API Resources** and are wrapped in a top-le
 | Pattern | Where |
 |--------|--------|
 | **API Resources** | `app/Http/Resources/*Resource.php` |
-| **Policy** | `AppointmentPolicy` — `cancel` only for the appointment owner (client) |
+| **Policy** | `AppointmentPolicy` — `view/update/delete/cancel` only for the appointment owner (client) |
 | **Event + listener** | `AppointmentCreated` → `DispatchAppointmentNotificationJob` |
 | **Queue / job** | `NotifyAppointmentParticipants` implements `ShouldQueue` |
 | **Service layer** | `AppointmentService` (business rules + transactions) |
@@ -155,6 +171,9 @@ Covered by feature tests:
 4. Cannot book an occupied slot
 5. Client cannot create doctor/service (403)
 6. Client can cancel own appointment; cannot cancel someone else’s (policy)
+7. Client can show/update/delete own appointment
+8. Admin has full CRUD for API reviews
+9. Custom 404 page, unknown `/api/*` paths return JSON errors (`AppStabilityTest`)
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
