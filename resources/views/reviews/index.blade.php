@@ -7,7 +7,7 @@
         <div class="mb-8">
             <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Reviews</h1>
             <p class="mt-2 text-gray-600 max-w-2xl">
-                Share your visit experience or tell us what we can improve. This is anonymous — include only what you are comfortable sharing.
+                Share your visit experience or tell us what we can improve. Submitted feedback is visible only to clinic staff — other visitors cannot read it here.
             </p>
         </div>
 
@@ -46,24 +46,6 @@
                     </form>
                 </div>
 
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-gray-900">Latest reviews</h2>
-                    <div class="grid gap-4 md:grid-cols-2">
-                        @forelse ($reviews as $review)
-                            <article class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                                <div class="flex items-center justify-between gap-3 mb-2">
-                                    <div class="font-semibold text-gray-900">{{ $review->name ?: 'Anonymous' }}</div>
-                                    <div class="text-xs text-gray-400">{{ $review->created_at->format('d.m.Y H:i') }}</div>
-                                </div>
-                                <p class="text-sm text-gray-700 leading-relaxed">
-                                    {{ $review->text }}
-                                </p>
-                            </article>
-                        @empty
-                            <p class="text-sm text-gray-500 col-span-2">No reviews yet. Be the first to share your experience.</p>
-                        @endforelse
-                    </div>
-                </div>
             </div>
 
             <div class="space-y-6">

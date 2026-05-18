@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Appointment;
 use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
 class AppointmentPolicy
 {
@@ -17,9 +18,23 @@ class AppointmentPolicy
         return $this->ownsAppointment($user, $appointment);
     }
 
-    public function delete(User $user, Appointment $appointment): bool
+    public function delete(User $user, Appointment $appointment): bool|Response
     {
-        return $this->ownsAppointment($user, $appointment);
+        if (! $this->ownsAppointment($user, $appointment)) {
+            return false;
+        }
+
+        $appointment->loadMissing('timeSlot');
+
+        if (! $appointment->canBeDeletedByClient()) {
+            return Response::deny(
+                'You can only delete a scheduled appointment at least '
+                .Appointment::CLIENT_DELETE_MIN_DAYS_BEFORE
+                .' days before the visit.'
+            );
+        }
+
+        return true;
     }
 
     public function cancel(User $user, Appointment $appointment): bool

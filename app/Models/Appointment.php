@@ -13,6 +13,9 @@ class Appointment extends Model
     public const STATUS_CANCELLED = 'cancelled';
     public const STATUS_COMPLETED = 'completed';
 
+    /** Minimum full days before visit start when a client may delete a scheduled appointment. */
+    public const CLIENT_DELETE_MIN_DAYS_BEFORE = 2;
+
     protected $fillable = [
         'doctor_id',
         'client_id',
@@ -40,6 +43,21 @@ class Appointment extends Model
     public function isExpired(): bool
     {
         return $this->expires_at !== null && $this->expires_at->isPast();
+    }
+
+    public function canBeDeletedByClient(): bool
+    {
+        if ($this->status !== self::STATUS_SCHEDULED) {
+            return false;
+        }
+
+        $startsAt = $this->timeSlot?->starts_at;
+
+        if ($startsAt === null) {
+            return false;
+        }
+
+        return now()->addDays(self::CLIENT_DELETE_MIN_DAYS_BEFORE)->lessThanOrEqualTo($startsAt);
     }
 
     /** Scope: only appointments that still "hold" the slot (scheduled and not expired). */

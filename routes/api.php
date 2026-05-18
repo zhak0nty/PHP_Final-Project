@@ -32,7 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:admin')->group(function () {
-        Route::apiResource('reviews', ReviewController::class);
+        Route::apiResource('reviews', ReviewController::class)->names('api.reviews');
     });
 });
 

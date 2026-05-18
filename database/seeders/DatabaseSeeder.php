@@ -76,6 +76,21 @@ class DatabaseSeeder extends Seeder
             'role' => User::ROLE_CLIENT,
         ]);
 
+        $demoDoctorUser = User::factory()->create([
+            'name' => 'Dr. Anna Demo',
+            'email' => 'dr.demo@medbooking.local',
+            'password' => 'doctor123',
+            'role' => User::ROLE_DOCTOR,
+        ]);
+
+        $demoDoctor = Doctor::create([
+            'user_id' => $demoDoctorUser->id,
+            'specialization' => 'Therapist',
+            'bio' => 'Demo doctor account for testing the doctor dashboard and appointments.',
+        ]);
+
+        $demoDoctor->services()->sync($services->take(3)->pluck('id')->all());
+
         TimeSlotGenerator::ensureUpcomingSlotsExist();
 
     }

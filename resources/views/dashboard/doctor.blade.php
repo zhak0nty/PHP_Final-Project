@@ -4,9 +4,14 @@
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
-        <div class="mb-8">
-            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Your appointments</h1>
-            <p class="mt-2 text-gray-600">Current client bookings.</p>
+        <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Your appointments</h1>
+                <p class="mt-2 text-gray-600">Current client bookings.</p>
+            </div>
+            <a href="{{ route('staff.reviews.index') }}" class="inline-flex items-center rounded-xl border border-[#6B21A8]/30 bg-[#6B21A8]/5 px-4 py-2 text-sm font-medium text-[#6B21A8] hover:bg-[#6B21A8]/10 transition-colors">
+                Patient feedback
+            </a>
         </div>
         <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             @if (! $doctor)

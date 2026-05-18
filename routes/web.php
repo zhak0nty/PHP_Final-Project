@@ -7,6 +7,7 @@ use App\Http\Controllers\GuestBookingController;
 use App\Http\Controllers\InfoPageController;
 use App\Http\Controllers\ReviewsController;
 use App\Http\Controllers\SpecialistController;
+use App\Http\Controllers\StaffReviewsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -43,9 +44,17 @@ Route::get('/booking/success', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    Route::middleware('role:admin,doctor')->group(function () {
+        Route::get('/dashboard/reviews', [StaffReviewsController::class, 'index'])
+            ->name('staff.reviews.index');
+    });
+
     Route::middleware('role:client')->group(function () {
         Route::post('/client/appointments', [ClientAppointmentController::class, 'store'])
             ->name('client.appointments.store')
+            ->middleware('throttle:30,1');
+        Route::delete('/client/appointments/{appointment}', [ClientAppointmentController::class, 'destroy'])
+            ->name('client.appointments.destroy')
             ->middleware('throttle:30,1');
         Route::get('/dashboard/booking/success', function () {
             if (! session()->has('appointment_created')) {

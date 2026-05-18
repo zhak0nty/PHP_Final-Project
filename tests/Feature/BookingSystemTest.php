@@ -176,14 +176,23 @@ class BookingSystemTest extends TestCase
         $client = User::where('role', User::ROLE_CLIENT)->firstOrFail();
         $doctor = Doctor::firstOrFail();
         $service = $doctor->services()->firstOrFail();
-        $slots = TimeSlot::where('doctor_id', $doctor->id)->orderBy('starts_at')->take(2)->get();
 
+        $nearSlot = TimeSlot::create([
+            'doctor_id' => $doctor->id,
+            'starts_at' => now()->addDay(),
+            'ends_at' => now()->addDay()->addMinutes(30),
+        ]);
+        $farSlot = TimeSlot::create([
+            'doctor_id' => $doctor->id,
+            'starts_at' => now()->addDays(5),
+            'ends_at' => now()->addDays(5)->addMinutes(30),
+        ]);
         Sanctum::actingAs($client);
 
         $created = $this->postJson('/api/appointments', [
             'doctor_id' => $doctor->id,
             'service_id' => $service->id,
-            'time_slot_id' => $slots[0]->id,
+            'time_slot_id' => $nearSlot->id,
         ])->assertCreated();
 
         $id = $created->json('data.id');
@@ -195,12 +204,68 @@ class BookingSystemTest extends TestCase
         $this->putJson("/api/appointments/{$id}", [
             'doctor_id' => $doctor->id,
             'service_id' => $service->id,
-            'time_slot_id' => $slots[1]->id,
+            'time_slot_id' => $farSlot->id,
         ])->assertOk()
-            ->assertJsonPath('data.time_slot_id', $slots[1]->id);
+            ->assertJsonPath('data.time_slot_id', $farSlot->id);
 
         $this->deleteJson("/api/appointments/{$id}")
             ->assertNoContent();
+    }
+
+    public function test_client_cannot_delete_appointment_within_two_days(): void
+    {
+        $this->seed();
+
+        $client = User::where('role', User::ROLE_CLIENT)->firstOrFail();
+        $doctor = Doctor::firstOrFail();
+        $service = $doctor->services()->firstOrFail();
+        $slot = TimeSlot::create([
+            'doctor_id' => $doctor->id,
+            'starts_at' => now()->addDay(),
+            'ends_at' => now()->addDay()->addMinutes(30),
+        ]);
+
+        Sanctum::actingAs($client);
+
+        $created = $this->postJson('/api/appointments', [
+            'doctor_id' => $doctor->id,
+            'service_id' => $service->id,
+            'time_slot_id' => $slot->id,
+        ])->assertCreated();
+
+        $id = $created->json('data.id');
+
+        $this->deleteJson("/api/appointments/{$id}")
+            ->assertForbidden();
+    }
+
+    public function test_client_can_delete_appointment_at_least_two_days_ahead(): void
+    {
+        $this->seed();
+
+        $client = User::where('role', User::ROLE_CLIENT)->firstOrFail();
+        $doctor = Doctor::firstOrFail();
+        $service = $doctor->services()->firstOrFail();
+        $slot = TimeSlot::create([
+            'doctor_id' => $doctor->id,
+            'starts_at' => now()->addDays(3),
+            'ends_at' => now()->addDays(3)->addMinutes(30),
+        ]);
+
+        Sanctum::actingAs($client);
+
+        $created = $this->postJson('/api/appointments', [
+            'doctor_id' => $doctor->id,
+            'service_id' => $service->id,
+            'time_slot_id' => $slot->id,
+        ])->assertCreated();
+
+        $id = $created->json('data.id');
+
+        $this->deleteJson("/api/appointments/{$id}")
+            ->assertNoContent();
+
+        $this->assertDatabaseMissing('appointments', ['id' => $id]);
     }
 
     public function test_admin_has_full_reviews_crud_in_api(): void

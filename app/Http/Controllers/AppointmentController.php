@@ -75,6 +75,7 @@ class AppointmentController extends Controller
     {
         $this->authorize('delete', $appointment);
 
+        $appointment->loadMissing('timeSlot');
         $appointment->delete();
 
         return response()->noContent();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAppointmentRequest;
+use App\Models\Appointment;
 use App\Services\AppointmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,6 +29,29 @@ class ClientAppointmentController extends Controller
                 'doctor'   => $appointment->doctor?->user?->name,
                 'service'  => $appointment->service?->name,
             ]);
+    }
+
+    public function destroy(Request $request, Appointment $appointment): RedirectResponse
+    {
+        $this->authorize('view', $appointment);
+
+        $appointment->loadMissing('timeSlot');
+
+        if (! $appointment->canBeDeletedByClient()) {
+            return redirect()
+                ->route('dashboard')
+                ->withErrors([
+                    'appointment' => 'You can only delete a scheduled appointment at least '
+                        .Appointment::CLIENT_DELETE_MIN_DAYS_BEFORE
+                        .' days before the visit.',
+                ]);
+        }
+
+        $appointment->delete();
+
+        return redirect()
+            ->route('dashboard')
+            ->with('status', 'Appointment deleted.');
     }
 }
 

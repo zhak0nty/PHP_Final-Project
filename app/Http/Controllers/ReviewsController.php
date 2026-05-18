@@ -11,13 +11,7 @@ class ReviewsController extends Controller
 {
     public function index(): View
     {
-        $reviews = Review::query()
-            ->where('kind', 'review')
-            ->latest()
-            ->take(20)
-            ->get();
-
-        return view('reviews.index', compact('reviews'));
+        return view('reviews.index');
     }
 
     public function store(StorePublicReviewRequest $request): RedirectResponse

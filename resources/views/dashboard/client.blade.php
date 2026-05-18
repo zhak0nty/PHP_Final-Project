@@ -9,6 +9,18 @@
             <p class="mt-2 text-gray-600">Choose a doctor, service, and a convenient time. The system validates your choices.</p>
         </div>
 
+        @if (session('status'))
+            <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
         <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr),minmax(0,3fr)] items-start">
             <div class="space-y-6">
                 <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -105,6 +117,7 @@
                                     <th class="px-4 py-3">Doctor</th>
                                     <th class="px-4 py-3">Service</th>
                                     <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 bg-white">
@@ -129,6 +142,23 @@
                                                 };
                                             @endphp
                                             <span class="inline-flex rounded-lg px-2.5 py-1 text-xs font-medium {{ $badge }}">{{ $statusLabel }}</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            @if ($appointment->canBeDeletedByClient())
+                                                <form method="POST" action="{{ route('client.appointments.destroy', $appointment) }}" class="inline" onsubmit="return confirm('Delete this appointment?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-sm font-medium text-red-600 hover:text-red-800 hover:underline">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            @elseif ($appointment->status === \App\Models\Appointment::STATUS_SCHEDULED)
+                                                <span class="text-xs text-gray-500" title="Deletion is only allowed at least {{ \App\Models\Appointment::CLIENT_DELETE_MIN_DAYS_BEFORE }} days before the visit">
+                                                    Cannot delete (&lt; {{ \App\Models\Appointment::CLIENT_DELETE_MIN_DAYS_BEFORE }} days)
+                                                </span>
+                                            @else
+                                                <span class="text-xs text-gray-400">—</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

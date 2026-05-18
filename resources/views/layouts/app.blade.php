@@ -41,6 +41,9 @@
                                     {{ auth()->user()->name }}
                                     <span class="text-[#6B21A8] font-medium"> · {{ auth()->user()->role }}</span>
                                 </span>
+                                @if (auth()->user()->isAdmin() || auth()->user()->isDoctor())
+                                    <a href="{{ route('staff.reviews.index') }}" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8]">Feedback</a>
+                                @endif
                                 <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-700 hover:text-[#6B21A8]">Dashboard</a>
                                 <form method="POST" action="{{ route('logout') }}" class="inline">
                                     @csrf
